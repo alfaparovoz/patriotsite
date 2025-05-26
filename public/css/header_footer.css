@@ -96,8 +96,16 @@ header > .container {
     justify-content: center; /* Центрирование элементов */
 }
 .menu a {
-    flex-shrink: 0;
-    white-space: nowrap; /* Запрет переноса текста */
+    text-decoration: none;
+    color: rgb(233, 93, 93);
+    margin: 0 20px; /* Уменьшил отступы для компактности */
+    position: relative;
+    text-shadow: 
+        0.02em 0 0 rgba(0, 0, 0, 0.3),  /* Тоньше чем в названии */
+        -0.02em 0 0 rgba(0, 0, 0, 0.3),
+        0 0.02em 0 rgba(0, 0, 0, 0.3),
+        0 -0.02em 0 rgba(0, 0, 0, 0.3);
+    transition: all 0.3s ease;
 }
 header .container .menu a{
     text-decoration: none;
@@ -131,7 +139,13 @@ header .container .menu a:hover {
     color: rgb(245, 141, 141);
     padding: 0 0 2px; 
 }
-
+.menu a:hover {
+    text-shadow: 
+        0.03em 0 0 rgba(0, 0, 0, 0.5),  /* Усилить при наведении */
+        -0.03em 0 0 rgba(0, 0, 0, 0.5),
+        0 0.03em 0 rgba(0, 0, 0, 0.5),
+        0 -0.03em 0 rgba(0, 0, 0, 0.5);
+}
 header .container .menu a:hover::after {
     width: 100%;
 }
