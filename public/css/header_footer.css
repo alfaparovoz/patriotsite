@@ -115,7 +115,7 @@ header .container .menu a {
 
 header .container .menu a::after {
     content: '';
-    position: absolute;
+    position: relative;
     bottom: 0;
     left: 50%;
     width: 0;
