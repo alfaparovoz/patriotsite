@@ -393,8 +393,17 @@ app.get('/profile', authenticateJWT, (req, res) => {
 app.post('/login', async (req, res) => {
     try {
         const { email, pass } = req.body;
+        console.log('Попытка входа для email:', email);
         const user = await User.findOne({ email });
-        
+        if (!user) {
+            console.log('Пользователь не найден');
+            return res.status(401).send('Неверные данные');
+        }
+        const isPasswordValid = await bcrypt.compare(pass, user.password);
+        if (!isPasswordValid) {
+            console.log('Неверный пароль для пользователя:', user.email);
+            return res.status(401).send('Неверные данные');
+        }
         if (!user || !(await bcrypt.compare(pass, user.password))) {
             return res.status(401).send('Неверные данные');
         }
