@@ -1361,3 +1361,23 @@ footer.footer-grid {
     font-size: 14px;
   }
 }
+@media (max-width: 480px) {
+  .profile-actions {
+    flex-direction: column !important;
+    gap: 12px !important;
+  }
+
+  #edit-profile, 
+  #logout-btn,
+  .profile-btn {
+    width: 100% !important;
+    padding: 12px !important;
+    font-size: 14px !important;
+    text-align: center !important;
+  }
+
+  .profile-container {
+    padding: 20px 10px !important;
+    margin: 10px !important;
+  }
+}
