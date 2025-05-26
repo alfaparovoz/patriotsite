@@ -442,7 +442,7 @@ app.post('/registration', upload.single('avatar'), async (req, res) => {
         const user = new User({
             username,
             email,
-            password: hashedPass,
+            password: pass,
             gender: pol,
             birthdate: new Date(Date.UTC(year, month - 1, day)),
             avatar: req.file ? `/upload/${req.file.filename}` : null,
