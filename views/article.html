@@ -1,0 +1,216 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Статья - Сайт патриотического развития</title>
+    <link rel="stylesheet" type="text/css" href="/css/header_footer.css">
+</head>
+<body>
+    <header class="container-fluid">
+        <div class="container d-flex">
+            <nav class="menu">
+                <a href="/main">Главная</a>
+                <a href="/articles">Список статей</a>
+                <a href="/sitegallery">Галерея</a>
+                <a href="/aboutsite">О сайте</a>
+                <div id="auth-section" class="auth-section">
+
+                </div>
+            </nav>
+        </div>
+        <div class="nazvanie">
+            <h1 style="color: rgb(248, 236, 234);">Сайт</h1>
+            <h1 style="color: rgb(80, 136, 209);">Патриотического</h1>
+            <h1 style="color: rgb(255, 58, 58);">Развития</h1>
+        </div>
+    </header>
+
+    <div class="prostranstvo">
+        <div class="article-container">
+            <img id="articleImage" class="article-image" src="" alt="Изображение статьи">
+            <h1 id="articleTitle"></h1>
+            <div class="article-meta">
+                <span id="articleAuthor"></span>
+                <span id="articleDate"></span>
+            </div>
+            <div id="articleContent" class="article-content"></div>
+
+            <div class="comments-section">
+                <h2>Комментарии</h2>
+                <div id="commentsContainer"></div>
+
+                <form id="commentForm" class="comment-form hidden">
+                    <textarea id="commentText" placeholder="Ваш комментарий..." required></textarea>
+                    <button type="submit" class="action-button">Отправить</button>
+                </form>
+                <div id="authWarning" class="hidden">
+                    <p>Для добавления комментария <a href="/login">войдите</a> или <a href="/registration">зарегистрируйтесь</a></p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <footer class="footer-grid">
+        <div class="footer-column">
+            <h2 style="color: rgb(248, 236, 234);">Сайт</h2>
+            <h2 style="color: rgb(14, 105, 223);">Патриотического</h2>
+            <h2 style="color: rgb(255, 58, 58);">Развития</h2>
+        </div>
+        <div class="footer-column">
+            <h3>НАШИ КОНТАКТЫ</h3>
+            <ul>
+              <li><a href="#">Почта</a></li>
+              <li><a href="#">Адрес</a></li>
+            </ul>
+        </div>
+        <div class="footer-column">
+            <h3>ПОДДЕРЖКА</h3>
+            <ul>
+              <li><a href="#">Связь с техподдержкой</a></li>
+            </ul>
+        </div>
+        <div class="footer-column">
+            <h3>О Сайте</h3>
+            <ul>
+              <li><a href="/aboutsite">История сайта</a></li>
+            </ul>
+        </div>     
+    </footer> 
+    <script src="/js/auth.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', async () => {
+            let userIsAdmin = false;
+            const urlParams = new URLSearchParams(window.location.search);
+            const articleId = urlParams.get('id');
+            const authSection = document.getElementById('auth-section');
+            const commentForm = document.getElementById('commentForm');
+            const authWarning = document.getElementById('authWarning');
+
+            // Проверка авторизации
+            async function checkAuth() {
+                try {
+                    const response = await fetch('/api/user', { credentials: 'include' });
+                    if (response.ok) {
+                        const userData = await response.json();
+                        userIsAdmin = userData.status === 'admin'; // Определяем статус
+                        commentForm.classList.remove('hidden');
+                        authWarning.classList.add('hidden');
+                    } else {
+                        commentForm.classList.add('hidden');
+                        authWarning.classList.remove('hidden');
+                    }
+                } catch (err) {
+                    console.error('Ошибка проверки авторизации:', err);
+                }
+            }
+
+            // Загрузка статьи
+            async function loadArticle() 
+            {
+                try {
+                    const response = await fetch(`/api/articles/${articleId}`);
+                    if (!response.ok) throw new Error('Статья не найдена');
+                    
+                    const article = await response.json();
+                    
+                    // Заполнение данных
+                    document.getElementById('articleImage').src = article.image || '/images/default-article.jpg';
+                    document.getElementById('articleTitle').textContent = article.title;
+                    document.getElementById('articleAuthor').textContent = `Автор: ${article.author.username}`;
+                    document.getElementById('articleDate').textContent = new Date(article.createdAt).toLocaleDateString('ru-RU');
+                    document.getElementById('articleContent').textContent = article.content;
+
+                    // Загрузка комментариев
+                    const commentsResponse = await fetch(`/api/comments?articleId=${articleId}`);
+                    const comments = await commentsResponse.json();
+                    const commentsContainer = document.getElementById('commentsContainer');
+                    
+                    commentsContainer.innerHTML = comments.map(comment => `
+                        <div class="comment">
+                            ${comment.deleted ? 
+                                '<div class="deleted-comment">Комментарий удален администратором</div>' :
+                                `<div class="comment-header">
+                                    <img src="${comment.author.avatar || '/images/default-avatar.png'}" 
+                                        class="comment-avatar" 
+                                        alt="Аватар ${comment.author.username}">
+                                    <div class="comment-author">${comment.author.username}</div>
+                                </div>
+                                <div class="comment-text">${comment.text}</div>`
+                            }
+                            ${userIsAdmin ? `<button class="delete-comment" data-id="${comment._id}">Удалить</button>` : ''}
+                            <div class="comment-date">${new Date(comment.createdAt).toLocaleDateString('ru-RU')}</div>
+                        </div>
+                    `).join('');
+                    if (userIsAdmin) 
+                    {
+                        const deleteBtn = document.createElement('button');
+                        deleteBtn.className = 'delete-article';
+                        deleteBtn.textContent = 'Удалить статью';
+                        deleteBtn.onclick = async () => {
+                            if (confirm('Удалить статью и все комментарии?')) {
+                                await fetch(`/api/articles/${articleId}`, {
+                                    method: 'DELETE',
+                                    credentials: 'include'
+                                });
+                                window.location.href = '/articles';
+                            }
+                        };
+                        document.querySelector('.article-container').prepend(deleteBtn);
+                    }
+
+                    // Обработчик удаления комментария
+                    document.querySelectorAll('.delete-comment').forEach(btn => {
+                        btn.addEventListener('click', async () => {
+                            if (confirm('Удалить комментарий?')) {
+                                await fetch(`/api/comments/${btn.dataset.id}`, {
+                                    method: 'DELETE',
+                                    credentials: 'include'
+                                });
+                                location.reload();
+                            }
+                        });
+                    });
+                } 
+                catch (err) 
+                {
+                    console.error('Ошибка загрузки статьи:', err);
+                    document.querySelector('.article-container').innerHTML = `
+                        <div class="error-message">
+                            <h2>Статья не найдена</h2>
+                            <a href="/articles" class="action-button">Вернуться к списку статей</a>
+                        </div>
+                    `;
+                }
+                
+            }
+
+            // Отправка комментария
+            commentForm.addEventListener('submit', async (e) => {
+                e.preventDefault();
+                const text = document.getElementById('commentText').value;
+
+                try {
+                    const response = await fetch('/api/comments', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ text, articleId }),
+                        credentials: 'include'
+                    });
+
+                    if (response.ok) {
+                        location.reload();
+                    } else {
+                        alert('Ошибка при отправке комментария');
+                    }
+                } catch (err) {
+                    console.error('Ошибка:', err);
+                }
+            });
+
+            await checkAuth();
+            await loadArticle();
+        });
+    </script>
+</body>
+</html>
