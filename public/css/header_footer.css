@@ -1234,26 +1234,56 @@ footer.footer-grid {
     z-index: 1000; /* Должен быть выше результатов поиска */
 }
 @media (max-width: 768px) {
+  /* 1. Исправление меню */
   .menu {
-    flex-direction: column;
-    gap: 10px;
-    padding: 10px 0;
-    display: none; /* Скрыть обычное меню */
-  }
-
-  .menu.active {
-    display: flex; /* Показывать при активации */
+    display: flex !important; /* Принудительно показываем меню */
+    flex-wrap: wrap;
+    gap: 12px;
+    justify-content: center;
+    padding: 15px 10px;
+    font-size: 15px;
+    overflow-x: auto; /* Горизонтальная прокрутка при необходимости */
+    -webkit-overflow-scrolling: touch;
   }
 
   .menu a {
-    margin: 5px 0;
-    font-size: 16px;
+    margin: 0 10px;
+    padding: 8px 12px;
+    background: rgba(255,255,255,0.1);
+    border-radius: 6px;
+    white-space: nowrap; /* Запрет переноса текста */
+    flex-shrink: 0; /* Запрет уменьшения элементов */
   }
 
+  .nazvanie {
+    padding: 40px 20px !important;
+    font-size: 22px !important;
+    line-height: 1.4;
+    text-shadow: 0.02em 0 0 rgba(0,0,0,0.3),
+                -0.02em 0 0 rgba(0,0,0,0.3),
+                0 0.02em 0 rgba(0,0,0,0.3),
+                0 -0.02em 0 rgba(0,0,0,0.3);
+  }
   .auth-section {
     margin-left: 0;
-    padding: 10px 0;
-    flex-direction: column;
+    padding: 15px 0;
+    flex-direction: row;
+    justify-content: center;
+    flex-wrap: wrap;
+    gap: 10px;
+  }
+}
+
+@media (max-width: 480px) {
+  .nazvanie {
+    padding: 30px 15px !important;
+    font-size: 20px !important;
+  }
+  
+  .menu a {
+    font-size: 14px;
+    padding: 6px 10px;
+    margin: 0 5px;
   }
 }
 @media (max-width: 768px) {
