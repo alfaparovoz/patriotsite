@@ -189,3 +189,23 @@ textarea {
     color: #3a6ea5;
     text-decoration: underline;
 }
+@media (max-width: 768px) {
+  .registration-container {
+    width: 95% !important;
+    margin: 10px auto !important;
+    padding: 20px 15px !important;
+  }
+
+  .form-group input[type="text"],
+  .form-group input[type="email"],
+  .form-group input[type="password"] {
+    width: calc(100% - 20px) !important;
+    margin: 0 10px !important;
+    font-size: 14px !important;
+  }
+
+  .submit-btn {
+    max-width: 90% !important;
+    margin: 10px auto !important;
+  }
+}
