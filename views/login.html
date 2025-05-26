@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Вход</title>
+    <link rel="stylesheet" href="/css/registration.css">
+</head>
+<body class="registration-page">
+    <div class="registration-container">
+        <h1>Вход</h1>
+        <form name="login" action="/login" method="POST">
+            <div class="form-group">
+                <label>Email</label>
+                <input type="email" name="email" required>
+            </div>
+            <div class="form-group">
+                <label>Пароль</label>
+                <input type="password" name="pass" required autocomplete="current-password">
+            </div>
+            <button type="submit" class="submit-btn">Войти</button>
+            <div id="error-message" style="color: red; margin-top: 10px;"></div>
+        </form>
+        <div class="form-footer">
+            Нет аккаунта? <a href="/registration">Зарегистрироваться</a>
+        </div>
+    </div>
+    <script>
+    document.forms.login.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const formData = new URLSearchParams(new FormData(e.target));
+        
+        try {
+            const response = await fetch('/login', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded'
+                },
+                body: formData,
+                credentials: 'include' // Передача куки
+            });
+
+            if (response.ok) {
+                window.location.href = '/profile';
+            } else {
+                document.getElementById('error-message').textContent = await response.text();
+            }
+        } catch (err) {
+            document.getElementById('error-message').textContent = 'Ошибка сети';
+        }
+    });
+</script>
+</body>
+</html>

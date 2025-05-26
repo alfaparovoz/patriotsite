@@ -1,0 +1,311 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Сайт патриотического развития</title>
+    <link rel="stylesheet" type="text/css" href="/css/header_footer.css"/> 
+</head>
+<body class="profile-page">
+    <header class="container-fluid">
+        <div class="container d-flex">
+            <nav class="menu">
+                <a href="/main">Главная</a>
+                <a href="/articles">Список статей</a>
+                <a href="/sitegallery">Галерея</a>
+                <a href="/aboutsite">О сайте</a>
+                <div id="auth-section" class="auth-section">
+                </div>
+            </nav>
+        </div>
+        <div class="nazvanie">
+            <h1 style="color: rgb(248, 236, 234);">Сайт</h1>
+            <h1 style="color: rgb(14, 105, 223);">Патриотического</h1>
+            <h1 style="color: rgb(255, 58, 58);">Развития</h1>
+        </div>
+    </header>
+    <div class="prostranstvo">
+        <div class="profile-container">
+            <div class="profile-header">
+                <img id="profile-avatar" src="/images/default-avatar.png" alt="Аватар" class="profile-avatar">
+                <div class="profile-info">
+                    <div class="username-edit">
+                        <h2 id="profile-username"></h2>
+                        <button id="edit-username" class="icon-btn">✏️</button>
+                        <input type="text" id="username-input" class="hidden">
+                    </div>
+                    <p id="profile-email">Email пользователя</p>
+                    <p id="profile-gender">Пол: не указан</p>
+                    <p id="profile-birthdate">Дата рождения: не указана</p>
+                </div>
+            </div>
+    
+            <div class="profile-details">
+                <div class="profile-section">
+                    <h3>Личная информация</h3>
+                    <button id="edit-bio" class="icon-btn">✏️</button>
+                    <p id="profile-bio"></p>
+                    <input type="text" id="bio-input" class="hidden"></input>
+                </div>
+                <input type="file" id="avatar-upload" hidden accept="image/*">    
+                <div class="profile-section">
+                    <h3>Статистика</h3>
+                    <p>Статей написано: <span id="articles-count">0</span></p>
+                    <p>Комментариев: <span id="comments-count">0</span></p>
+                    <p>Статус пользователя: <span id="user-status">user</span></p>
+                    <p>Дата регистрации: <span id="registration-date">Недоступно</span></p>
+                </div>
+            </div>
+            <div id="requests-section" class="profile-section hidden">
+                <h3>Входящие запросы</h3>
+                <div id="requests-list"></div>
+            </div>
+            <div class="profile-actions">
+                <button id="edit-profile" class="profile-btn">Редактировать профиль</button>
+                <button id="logout-btn" class="profile-btn logout">Выйти</button>
+                <button id="become-writer" class="profile-btn hidden">Стать автором</button>
+                <button id="write-article" class="profile-btn hidden">Написать статью</button>
+                <button id="update-gallery" class="profile-btn hidden">Обновить галерею</button>
+            </div>
+        </div>
+    </div>
+    <footer class="footer-grid">
+        <div class="footer-column">
+            <h2 style="color: rgb(248, 236, 234);">Сайт</h2>
+            <h2 style="color: rgb(6, 74, 163);">Патриотического</h2>
+            <h2 style="color: rgb(255, 58, 58);">Развития</h2>
+        </div>
+        <div class="footer-column">
+            <h3>НАШИ КОНТАКТЫ</h3>
+            <ul>
+              <li><a href="#">Почта</a></li>
+              <li><a href="#">Адрес</a></li>
+            </ul>
+        </div>  
+        <div class="footer-column">
+            <h3>ПОДДЕРЖКА</h3>
+            <ul>
+              <li><a href="#">Связь с техподдержкой</a></li>
+            </ul>
+        </div>
+        <div class="footer-column">
+            <h3>О Сайте</h3>
+            <ul>
+              <li><a href="/aboutsite">История сайта</a></li>
+            </ul>
+        </div>     
+    </footer> 
+    <script>    
+document.addEventListener('DOMContentLoaded', async () => {
+    try {
+        // Загрузка данных пользователя
+        const response = await fetch('/api/user', { 
+            credentials: 'include'
+        });
+
+        if (!response.ok) {
+            const errorData = await response.json();
+            console.error('Ошибка:', errorData.error);
+            return;
+        }
+        
+
+        const userData = await response.json();
+        
+        // Обновление данных профиля
+        document.getElementById('profile-avatar').src = userData.avatar || '/images/default-avatar.png';
+        document.getElementById('profile-username').textContent = userData.username || 'Не указано';
+        document.getElementById('profile-email').textContent = userData.email || 'Не указано';
+        document.getElementById('profile-gender').textContent = `Пол: ${userData.gender || 'не указан'}`;
+        document.getElementById('profile-birthdate').textContent = `Дата рождения: ${userData.birthdate ? new Date(userData.birthdate).toLocaleDateString('ru-RU') : 'не указана'}`;
+        document.getElementById('profile-bio').textContent = userData.bio || 'Информация о себе не указана';
+        document.getElementById('registration-date').textContent = userData.registrationDate ? new Date(userData.registrationDate).toLocaleDateString('ru-RU') : 'Недоступно';
+        document.getElementById('articles-count').textContent = userData.articlesCount;
+        document.getElementById('comments-count').textContent = userData.commentsCount;
+        document.getElementById('user-status').textContent = userData.status;
+
+        // Управление кнопками статуса
+        const becomeWriterBtn = document.getElementById('become-writer');
+        const writeArticleBtn = document.getElementById('write-article');
+        const requestsSection = document.getElementById('requests-section');
+
+        if (userData.status === 'user') {
+            becomeWriterBtn.classList.remove('hidden');
+        }
+        if (['writer', 'admin'].includes(userData.status)) {
+            writeArticleBtn.classList.remove('hidden');
+        }
+
+        if (userData.status === 'admin') {
+            document.getElementById('update-gallery').classList.remove('hidden');
+        }
+        if (userData.status === 'admin') {
+            requestsSection.classList.remove('hidden');
+            loadRequests(); // Загрузка запросов для админа
+        }
+
+    } catch (err) {
+        console.error('Ошибка:', err);
+    }
+
+    // Обработчики редактирования профиля
+    document.getElementById('profile-avatar').addEventListener('click', () => {
+        document.getElementById('avatar-upload').click();
+    });
+
+    document.getElementById('edit-username').addEventListener('click', () => {
+        const usernameDisplay = document.getElementById('profile-username');
+        const usernameInput = document.getElementById('username-input');
+        
+        usernameDisplay.classList.toggle('hidden');
+        usernameInput.classList.toggle('hidden');
+        
+        if (!usernameInput.classList.contains('hidden')) {
+            usernameInput.value = usernameDisplay.textContent;
+        }
+    });
+
+    document.getElementById('edit-bio').addEventListener('click', () => {
+        const bioDisplay = document.getElementById('profile-bio');
+        const bioInput = document.getElementById('bio-input');
+        
+        bioDisplay.classList.toggle('hidden');
+        bioInput.classList.toggle('hidden');
+        
+        if (!bioInput.classList.contains('hidden')) {
+            bioInput.value = bioDisplay.textContent;
+        }
+    });
+
+    document.getElementById('avatar-upload').addEventListener('change', function(e) {
+        const file = e.target.files[0];
+        if (file) {
+            const reader = new FileReader();
+            reader.onload = (event) => {
+                document.getElementById('profile-avatar').src = event.target.result;
+            };
+            reader.readAsDataURL(file);
+        }
+    });
+
+    // Обработчик сохранения профиля
+    document.getElementById('edit-profile').addEventListener('click', async () => {
+        const formData = new FormData();
+        formData.append('username', document.getElementById('username-input').value || document.getElementById('profile-username').textContent);
+        formData.append('bio', document.getElementById('bio-input').value || document.getElementById('profile-bio').textContent);
+        
+        const avatarFile = document.getElementById('avatar-upload').files[0];
+        if (avatarFile) formData.append('avatar', avatarFile);
+
+        try {
+            const response = await fetch('/api/user', {
+                method: 'PUT',
+                body: formData,
+                credentials: 'include'
+            });
+
+            if (!response.ok) {
+                const error = await response.json();
+                alert(error.error);
+                return;
+            }
+
+            const updatedUser = await response.json();
+            document.getElementById('profile-username').textContent = updatedUser.username;
+            document.getElementById('profile-bio').textContent = updatedUser.bio;
+            if (updatedUser.avatar) {
+                document.getElementById('profile-avatar').src = updatedUser.avatar;
+            }
+
+            document.getElementById('username-input').classList.add('hidden');
+            document.getElementById('profile-username').classList.remove('hidden');
+            
+        } catch (err) {
+            alert('Ошибка сохранения изменений');
+        }
+    });
+
+    // Обработчик кнопки выхода
+    document.getElementById('logout-btn').addEventListener('click', async () => {
+        await fetch('/logout', { credentials: 'include' });
+        window.location.href = '/main';
+    });
+        document.getElementById('write-article').addEventListener('click', async () => {
+        window.location.href = '/writer';
+    });
+        document.getElementById('update-gallery').addEventListener('click', () => {
+        window.location.href = '/newimage';
+    });
+    // Обработчик кнопки "Стать автором"
+    document.getElementById('become-writer').addEventListener('click', async () => {
+        try {
+            const response = await fetch('/api/requests', {
+                method: 'POST',
+                credentials: 'include'
+            });
+            
+            if (response.ok) {
+                alert('Запрос отправлен администраторам');
+                document.getElementById('become-writer').disabled = true;
+            }
+        } catch (err) {
+            alert('Ошибка отправки запроса');
+        }
+    });
+
+    // Функция загрузки запросов для админа
+    async function loadRequests() {
+        try {
+            const response = await fetch('/api/requests', { credentials: 'include' });
+            const requests = await response.json();
+            
+            const requestsList = document.getElementById('requests-list');
+            requestsList.innerHTML = requests.map(request => `
+                <div class="request-item">
+                    <span>${request.user.username}</span>
+                    <div>
+                        <button class="approve-btn" data-id="${request._id}">✓</button>
+                        <button class="reject-btn" data-id="${request._id}">✕</button>
+                    </div>
+                </div>
+            `).join('');
+
+            // Обработчики для кнопок одобрения/отклонения
+            document.querySelectorAll('.approve-btn').forEach(btn => {
+                btn.addEventListener('click', async () => {
+                    await processRequest(btn.dataset.id, 'approved');
+                });
+            });
+
+            document.querySelectorAll('.reject-btn').forEach(btn => {
+                btn.addEventListener('click', async () => {
+                    await processRequest(btn.dataset.id, 'rejected');
+                });
+            });
+        } catch (err) {
+            console.error('Ошибка загрузки запросов:', err);
+        }
+    }
+
+    // Обработка запроса администратором
+    async function processRequest(requestId, status) {
+        try {
+            const response = await fetch(`/api/requests/${requestId}`, {
+                method: 'PUT',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ status }),
+                credentials: 'include'
+            });
+            
+            if (response.ok) {
+                loadRequests(); // Обновляем список
+                alert('Статус запроса обновлен');
+            }
+        } catch (err) {
+            alert('Ошибка обработки запроса');
+        }
+    }
+});
+</script>
+</body>
+</html>

@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Сайт патриотического развития</title>
+    <link rel="stylesheet" type="text/css" href="/css/header_footer.css"/> 
+</head>
+<body>
+    <header class="container-fluid">
+        <div class="container d-flex">
+            <nav class="menu">
+                <a href="/main">Главная</a>
+                <a href="/articles">Список статей</a>
+                <a href="/sitegallery">Галерея</a>
+                <a href="/aboutsite">О сайте</a>
+                <div id="auth-section" class="auth-section">
+
+                </div>
+            </nav>
+        </div>
+        <div class="nazvanie">
+            <h1 style="color: rgb(248, 236, 234);">Сайт</h1>
+            <h1 style="color: rgb(14, 105, 223);">Патриотического</h1>
+            <h1 style="color: rgb(255, 58, 58);">Развития</h1>
+        </div>
+    </header>
+    <div class="prostranstvo">
+        <div class="writer-container">
+            <form id="galleryForm" enctype="multipart/form-data">
+                <input type="file" name="image" accept="image/*" required>
+                <textarea name="caption" placeholder="Описание изображения" required></textarea>
+                <button type="submit">Загрузить в галерею</button>
+            </form>
+        </div>
+    </div>
+    <footer class="footer-grid">
+        <div class="footer-column">
+            <h2 style="color: rgb(248, 236, 234);">Сайт</h2>
+            <h2 style="color: rgb(80, 136, 209);">Патриотического</h2>
+            <h2 style="color: rgb(255, 58, 58);">Развития</h2>
+        </div>
+        <div class="footer-column">
+            <h3>НАШИ КОНТАКТЫ</h3>
+            <ul>
+              <li><a href="#">Почта</a></li>
+              <li><a href="#">Адрес</a></li>
+            </ul>
+        </div>
+        <div class="footer-column">
+            <h3>ПОДДЕРЖКА</h3>
+            <ul>
+              <li><a href="#">Связь с техподдержкой</a></li>
+            </ul>
+        </div>
+        <div class="footer-column">
+            <h3>О Сайте</h3>
+            <ul>
+              <li><a href="/aboutsite">История сайта</a></li>
+            </ul>
+        </div>     
+    </footer> 
+    <script> 
+    document.getElementById('galleryForm').addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const formData = new FormData(e.target);
+        
+        try {
+            const response = await fetch('/api/gallery', {
+                method: 'POST',
+                body: formData,
+                credentials: 'include'
+            });
+            
+            if (response.ok) {
+                alert('Изображение успешно загружено!');
+                window.location.href = '/sitegallery';
+            } else {
+                const error = await response.json();
+                alert(error.error);
+            }
+        } catch (err) {
+            alert('Ошибка соединения');
+        }
+    });
+   </script> 
+    <script src="/js/auth.js"></script>
+</body>
+</html>
