@@ -418,7 +418,11 @@ app.post('/login', async (req, res) => {
 });
 // Выход
 app.get('/logout', (req, res) => {
-    res.clearCookie('token');
+    res.clearCookie('token', {
+        domain: 'patriotsite.onrender.com', // Укажите ваш домен
+        secure: true,    // Для HTTPS
+        sameSite: 'none' // Для кросс-доменных запросов
+    });
     res.redirect('/');
 });
 // Регистрация
