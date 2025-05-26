@@ -428,7 +428,7 @@ app.post('/login', async (req, res) => {
 // Выход
 app.get('/logout', (req, res) => {
     res.clearCookie('token', {
-        domain: 'patriotsite.onrender.com', // Укажите ваш домен
+        domain: 'patriot-site.onrender.com', 
         secure: true,    // Для HTTPS
         sameSite: 'none' // Для кросс-доменных запросов
     });
