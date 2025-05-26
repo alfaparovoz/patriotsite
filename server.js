@@ -439,9 +439,6 @@ app.post('/registration', upload.single('avatar'), async (req, res) => {
     try {
         const { username, email, pass, day, month, year, pol, bio } = req.body;
         
-        // Хеширование пароля (убедитесь, что в модели User есть pre-save хук!)
-        const hashedPass = await bcrypt.hash(pass, 10);
-        
         const user = new User({
             username,
             email,
